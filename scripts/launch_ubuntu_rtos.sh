@@ -1,5 +1,4 @@
 #!/bin/bash
-# board: ROS-CUBE-CFL-I7, scenario: INDUSTRY_ROS2SYSTEMOS, rtos: UBUNTU+XENOMAI
  
 # set -x
  

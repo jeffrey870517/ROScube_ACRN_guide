@@ -1,6 +1,5 @@
-
 #!/bin/bash
-# board: ROS-CUBE-CFL-I7, scenario: INDUSTRY_ROS2SYSTEMOS, uos: UBUNTU
+
 # pci devices for passthru
 declare -A passthru_vpid
 declare -A passthru_bdf

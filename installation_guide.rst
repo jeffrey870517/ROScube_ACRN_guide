@@ -178,6 +178,9 @@ Configure Hypervisor
 Install Service VM kernel
 *************************
 
+Build Service VM kernel
+=======================
+
 #. Get code from GitHub
 
    .. code-block:: bash
@@ -208,6 +211,9 @@ Install Service VM kernel
      sudo make modules_install
      sudo cp arch/x86/boot/bzImage /boot/acrn-ROS2SystemSOS
 
+Update Grub
+===========
+
 #. Get the UUID and PARTUUID.
 
    .. code-block:: bash
@@ -234,13 +240,15 @@ Install Service VM kernel
        multiboot2 /boot/acrn/acrn.bin  root=PARTUUID="<PARTUUID>"
        module2 /boot/acrn-ROS2SystemSOS Linux_bzImage
      }
+  
+   .. figure:: images/rqi-acrn-grun-40_custom.png
 
 #. Update ``/etc/default/grub`` to make grub menu visible and load Service VM as default.
 
    .. code-block:: bash
 
      GRUB_DEFAULT=ubuntu-service-vm
-     # GRUB_TIMEOUT_STYLE=hidden
+     #GRUB_TIMEOUT_STYLE=hidden
      GRUB_TIMEOUT=5 
 
 #. Then update grub and reboot.
@@ -255,20 +263,31 @@ Install Service VM kernel
 
    .. code-block:: bash
 
-     $ sudo dmesg | grep ACRN (TODO: Add result)
+     sudo dmesg | grep ACRN
+  
+   .. figure:: images/rqi-acrn-dmesg.png
 
 Install User VM
 ***************
 
-We need to create User VM image by QEMU/KVM first.
-**Please run the following commands on native Linux kernel, or you'll get the error message.**
+Before create User VM
+=====================
 
-#. Install necessary packages
+#. Download Ubuntu image (Here we use `Ubuntu 18.04.5 LTS <https://releases.ubuntu.com/18.04.5/>`_ as example):
+
+#. Install necessary packages.
 
    .. code-block:: bash
 
      sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf
      sudo reboot
+
+Create User VM image
+====================
+
+.. note::
+
+  Please create User VM image on **native Linux kernel**, not ACRN kernel, or you'll get the error message.
 
 #. Start virtual machine manager application.
 
@@ -276,14 +295,45 @@ We need to create User VM image by QEMU/KVM first.
 
      sudo virt-manager
 
-#. TODO: Add graph
+#. Create a new virtual machine.
 
-#. Install dependency
+   .. figure:: images/rqi-acrn-kvm-new-vm.png
+
+#. Select your ISO image path.
+
+   .. figure:: images/rqi-acrn-kvm-choose-iso.png
+
+#. Select CPU and RAM for the VM.
+   You can modify as high as you can to accelerate the installation time.
+   The settings here is not related to the resource of UOS on ACRN, which can be decided later.
+
+   .. figure:: images/rqi-acrn-kvm-cpu-ram.png
+
+#. Select disk size you want. **Note that this can't be modified after creating image!**
+
+   .. figure:: images/rqi-acrn-kvm-storage.png
+
+#. Edit image name and select "Customize configuration before install".
+
+   .. figure:: images/rqi-acrn-kvm-name.png
+
+#. Select correct Firmware, apply it, and Begin Installation.
+
+   .. figure:: images/rqi-acrn-kvm-firmware.png
+
+#. Now you'll see the installation page of Ubuntu.
+   After install Ubuntu, you can also install some necessary packages, like ssh, vim, ROS 2...etc.
+   We'll clone the image for realtime VM, and this can reduce your time.
+   Poweroff the VM after complete.
+
+Run User VM
+===========
+
+#. Install dependency.
 
    .. code-block:: bash
 
-     sudo -E apt-get install iasl
- 
+     sudo apt install iasl
      cd /tmp
      wget https://acpica.org/sites/acpica/files/acpica-unix-20191018.tar.gz
      tar zxvf acpica-unix-20191018.tar.gz
@@ -304,13 +354,23 @@ We need to create User VM image by QEMU/KVM first.
 
    .. code-block:: bash
 
-     wget TODO (launch file)
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_uos.sh
      chmod +x ./launch_ubuntu_uos.sh 
 
-#. Launch the VM
+#. Setup network
 
    .. code-block:: bash
 
+     mkdir -p ~/acrn/tools/
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/acrn_bridge.sh
+     chmod +x ./acrn_bridge.sh
+     ./acrn_bridge.sh
+
+#. Reboot to ACRN kernel and Launch the VM
+
+   .. code-block:: bash
+
+     cd ~/acrn/uosVM
      sudo ./launch_ubuntu_uos.sh
 
 Install Real-Time VM
@@ -332,7 +392,7 @@ Install Real-Time VM
 
    .. code-block:: bash
 
-     wget TODO (launch file)
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_rtos.sh
      chmod +x ./launch_rtos.sh
 
 #. Launch the VM
