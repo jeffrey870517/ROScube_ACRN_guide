@@ -73,14 +73,14 @@ acrn-dm -A -m $mem_size -s 0:0,hostbridge -U d2795438-25d6-11e8-864e-cb7a18b3464
    $logger_setting \
    --mac_seed $mac_seed \
    --ovmf /usr/share/acrn/bios/OVMF.fd \
-   --cpu_affinity 2,3,4 \
+   --cpu_affinity 1,2,3 \
    $intr_storm_monitor \
    -s 3,virtio-blk,./ROS2SystemUOS.img \
    -s 4,passthru,04/00/0 \
    -s 5,virtio-net,${tap_id} \
    -s 6,virtio-hyper_dmabuf \
    -s 7,virtio-rnd \
-   -s 8,xhci,1-5.4 \
+   -s 8,xhci,1-2 \
    -s 10,virtio-console,@stdio:stdio_port \
    $pm_channel $pm_by_vuart $pm_vuart_node \
    $vm_name

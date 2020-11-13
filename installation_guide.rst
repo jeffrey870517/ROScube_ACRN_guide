@@ -323,13 +323,14 @@ Create User VM image
 
 #. Now you'll see the installation page of Ubuntu.
    After install Ubuntu, you can also install some necessary packages, like ssh, vim, ROS 2...etc.
-   We'll clone the image for realtime VM, and this can reduce your time.
+   We'll clone the image for realtime VM, and this can save your time.
    Poweroff the VM after complete.
 
 Run User VM
 ===========
 
 #. Install dependency.
+   The origin version of iasl is too old for ACRN and should be upraged.
 
    .. code-block:: bash
 
@@ -337,12 +338,11 @@ Run User VM
      cd /tmp
      wget https://acpica.org/sites/acpica/files/acpica-unix-20191018.tar.gz
      tar zxvf acpica-unix-20191018.tar.gz
-
      cd acpica-unix-20191018
      make clean && make iasl
      sudo cp ./generate/unix/bin/iasl /usr/sbin/
 
-#. Convert KVM image file format
+#. Convert KVM image file format.
 
    .. code-block:: bash
 
@@ -350,14 +350,14 @@ Run User VM
      cd ~/acrn/uosVM
      sudo qemu-img convert -f qcow2 -O raw /var/lib/libvirt/images/ROS2SystemUOS.qcow2 ./ROS2SystemUOS.img
 
-#. Prepare a Launch Script File
+#. Prepare a Launch Script File.
 
    .. code-block:: bash
 
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_uos.sh
      chmod +x ./launch_ubuntu_uos.sh 
 
-#. Setup network
+#. Setup network and reboot to take effect.
 
    .. code-block:: bash
 
@@ -365,8 +365,9 @@ Run User VM
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/acrn_bridge.sh
      chmod +x ./acrn_bridge.sh
      ./acrn_bridge.sh
+     sudo reboot
 
-#. Reboot to ACRN kernel and Launch the VM
+#. Reboot to ACRN kernel and now you can launch the VM.
 
    .. code-block:: bash
 
@@ -376,11 +377,51 @@ Run User VM
 Install Real-Time VM
 ********************
 
-#. Clone RTVM from User VM. TODO: Add graph
+.. note::
 
-#. Install Xenomai kernel. TODO: found the tutorial.
+  Please create Real-Time VM image on **native Linux kernel**, not ACRN kernel, or you'll get the error message.
 
-#. Convert KVM image file format
+#. Clone Real-Time VM from User VM. (Right click User VM and then clone)
+
+   .. figure:: images/rqi-acrn-rtos-clone.png
+
+#. You'll see the Real-Time VM is ready.
+
+   .. figure:: images/rqi-acrn-rtos-ready.png
+
+#. Run the VM and modify your VM hostname.
+
+   .. code-block:: bash
+
+     hostnamectl set-hostname ros-RTOS
+
+#. Install Xenomai kernel.
+
+   .. code-block:: bash
+
+     sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev
+     git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
+     cd linux-stable-xenomai && make acrn_defconfig
+     CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
+     sudo dpkg -i ../*.deb
+
+   You can refer to `Run Xenomai as the User VM OS (Real-time VM) <https://projectacrn.github.io/latest/tutorials/using_xenomai_as_uos.html>`_
+
+#. Update ``/etc/default/grub``.
+
+   .. code-block:: bash
+
+     GRUB_DEFAULT=ubuntu-service-vm
+     #GRUB_TIMEOUT_STYLE=hidden
+     GRUB_TIMEOUT=5 
+
+#. Update GRUB and then poweroff.
+
+   .. code-block:: bash
+
+     sudo update-grub
+
+#. Convert KVM image file format.
 
    .. code-block:: bash
 
@@ -393,7 +434,7 @@ Install Real-Time VM
    .. code-block:: bash
 
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_rtos.sh
-     chmod +x ./launch_rtos.sh
+     chmod +x ./launch_ubuntu_rtos.sh
 
 #. Launch the VM
 

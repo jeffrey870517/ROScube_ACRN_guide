@@ -77,10 +77,11 @@ acrn-dm -A -m $mem_size -s 0:0,hostbridge \
   --ovmf /usr/share/acrn/bios/OVMF.fd \
   --rtvm \
   --virtio_poll 1000000 \
-  --cpu_affinity 5 \
+  --cpu_affinity 4,5 \
   -s 3,virtio-blk,./ROS2SystemRTOS.img \
   -s 4,passthru,06/00/0 \
   -s 5,virtio-net,${tap_id} \
+  -s 8,xhci,1-1 \
   -s 9,virtio-console,@stdio:stdio_port \
   $logger_setting \
   $pm_channel $pm_by_vuart \
