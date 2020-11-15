@@ -12,7 +12,7 @@ Verified version
 - GCC version: **7.5.0**
 - ACRN-hypervisor branch: **release_2.1**
 - ACRN-Kernel (Service VM kernel): **release_2.1**
-- RT kernel for Ubuntu User OS: TODO
+- RT kernel for Ubuntu User OS: **Linux kernel 4.19.59 with Xenomai 3.1**
 - HW: `ROScube-I <https://www.adlinktech.com/Products/ROS2_Solution/ROS2_Controller/ROScube-I?lang=en>`_
 
 Architecture
@@ -377,6 +377,9 @@ Run User VM
 Install Real-Time VM
 ********************
 
+Copy Real-Time VM image
+=======================
+
 .. note::
 
   Please create Real-Time VM image on **native Linux kernel**, not ACRN kernel, or you'll get the error message.
@@ -389,6 +392,9 @@ Install Real-Time VM
 
    .. figure:: images/rqi-acrn-rtos-ready.png
 
+Setup Real-Time VM
+==================
+
 #. Run the VM and modify your VM hostname.
 
    .. code-block:: bash
@@ -399,13 +405,36 @@ Install Real-Time VM
 
    .. code-block:: bash
 
-     sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev
+     sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev haveged
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
      cd linux-stable-xenomai && make acrn_defconfig
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
      sudo dpkg -i ../*.deb
 
-   You can refer to `Run Xenomai as the User VM OS (Real-time VM) <https://projectacrn.github.io/latest/tutorials/using_xenomai_as_uos.html>`_
+#. To install Xenomai library and tools, please refer to `Xenomai Official Documentation <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
+
+#. Install Xenomai library and tools.
+
+   .. code-block:: bash
+
+     wget https://xenomai.org/downloads/xenomai/stable/xenomai-3.1.tar.bz2
+     tar xf xenomai-3.1.tar.bz2
+     cd xenomai-3.1
+     sudo ./configure --with-core=cobalt \
+            --enable-smp \
+            --enable-pshared
+            --enable-dlopen-libs \
+            --enable-tls
+     make -j`nproc`
+     sudo make install
+
+#. Allow non-root user to run Xenomai
+
+   .. code-block:: bash
+
+     sudo addgroup xenomai --gid 1234
+     sudo addgroup root xenomai
+     sudo usermod -a -G xenomai $USER
 
 #. Update ``/etc/default/grub``.
 
@@ -414,12 +443,23 @@ Install Real-Time VM
      GRUB_DEFAULT=ubuntu-service-vm
      #GRUB_TIMEOUT_STYLE=hidden
      GRUB_TIMEOUT=5 
+     ...
+     GRUB_CMDLINE_LINUX="i915.enable_rc6=0 i915.enable_dc=0 i915.disable_power_well=0 i915.enable_execlists=0 i915.powersave=0 processor.max_cstate=0 intel.max_cstate=0 processor_idle.max_cstate=0 intel_idle.max_cstate=0 clocksource=tsc tsc=reliable nmi_watchdog=0 nosoftlockup intel_pstate=disable idle=poll noht nosmap mce=ignore_mce nohalt acpi_irq_nobalance noirqbalance vt.handoff=7 rcu_nocb_poll nohz_full=1 xenomai.allowed_group=1234 nosmt"
 
-#. Update GRUB and then poweroff.
+#. Update GRUB.
 
    .. code-block:: bash
 
      sudo update-grub
+
+#. Poweroff the VM.
+
+   .. code-block:: bash
+
+     sudo poweroff
+
+Run Real-Time VM
+================
 
 #. Convert KVM image file format.
 
@@ -436,8 +476,14 @@ Install Real-Time VM
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_rtos.sh
      chmod +x ./launch_ubuntu_rtos.sh
 
-#. Launch the VM
+#. Reboot to ACRN kernel and now you can launch the VM.
 
    .. code-block:: bash
 
+     cd ~/acrn/rtosVM
      sudo ./launch_ubuntu_rtos.sh
+
+TODO
+====
+
+What is inside the launch file.
