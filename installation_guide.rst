@@ -23,6 +23,10 @@ The scenario will be like the following:
 
 .. figure:: images/rqi-acrn-architecture.png
 
+* Service OS: Used to launch User OS and Real-Time OS.
+* User OS: Run ROS 2 application in this OS, like SLAM, navigation.
+* Real-Time OS: Run the critical task in this OS, like base driver.
+
 Prerequisites
 *************
 
@@ -424,7 +428,7 @@ Setup Real-Time VM
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
      cd linux-stable-xenomai && make acrn_defconfig
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
-     sudo dpkg -i ../*.deb
+     sudo dpkg -i ../linux-headers-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb ../linux-image-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb
 
 #. Install Xenomai library and tools.
    For more detail, please refer to `Xenomai Official Documentation <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
@@ -434,11 +438,11 @@ Setup Real-Time VM
      wget https://xenomai.org/downloads/xenomai/stable/xenomai-3.1.tar.bz2
      tar xf xenomai-3.1.tar.bz2
      cd xenomai-3.1
-     sudo ./configure --with-core=cobalt \
-            --enable-smp \
-            --enable-pshared
-            --enable-dlopen-libs \
-            --enable-tls
+     ./configure --with-core=cobalt \
+         --enable-smp \
+         --enable-pshared \
+         --enable-dlopen-libs \
+         --enable-tls
      make -j`nproc`
      sudo make install
 
@@ -454,7 +458,7 @@ Setup Real-Time VM
 
    .. code-block:: bash
 
-     GRUB_DEFAULT=ubuntu-service-vm
+     GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.19.59-xenomai-3.1-acrn+"
      #GRUB_TIMEOUT_STYLE=hidden
      GRUB_TIMEOUT=5 
      ...
