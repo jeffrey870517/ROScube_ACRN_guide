@@ -21,10 +21,18 @@ Architecture
 In the tutorial, we'll guide you how install ACRN Industry Scenario on ROScube-I.
 The scenario will be like the following:
 
-TODO: Add architecture
+.. figure:: images/rqi-acrn-architecture.png
 
 Prerequisites
 *************
+
+* Connect the ROScube-I like the following:
+
+  - HDMI for monitor.
+  - Network on Ethernet port 1.
+  - Keyboard and mouse on USB.
+
+.. figure:: images/rqi-acrn-hw-connection.jpg
 
 * Install Ubuntu 18.04 on ROScube-I.
 
@@ -324,7 +332,14 @@ Create User VM image
 #. Now you'll see the installation page of Ubuntu.
    After install Ubuntu, you can also install some necessary packages, like ssh, vim, ROS 2...etc.
    We'll clone the image for realtime VM, and this can save your time.
-   Poweroff the VM after complete.
+
+#. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
+
+#. Poweroff the VM after complete.
+
+   .. code-block:: bash
+
+     sudo poweroff
 
 Run User VM
 ===========
@@ -411,9 +426,8 @@ Setup Real-Time VM
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
      sudo dpkg -i ../*.deb
 
-#. To install Xenomai library and tools, please refer to `Xenomai Official Documentation <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
-
 #. Install Xenomai library and tools.
+   For more detail, please refer to `Xenomai Official Documentation <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
 
    .. code-block:: bash
 
@@ -483,7 +497,85 @@ Run Real-Time VM
      cd ~/acrn/rtosVM
      sudo ./launch_ubuntu_rtos.sh
 
-TODO
-====
+.. note::
 
-What is inside the launch file.
+  Please use poweroff instead of reboot in Real-Time VM.
+  In ACRN design, the system will also reboot while rebooting Real-Time VM.
+
+About the Launch File
+*********************
+
+The launch file in this tutorial have the following hardware resource allocation.
+
+.. csv-table::
+   :header: "Resource", "Service VM", "User VM", "Real-Time VM"
+   :widths: 15, 15, 15, 15
+
+   "CPU", "0", "1,2,3", "4,5"
+   "Memory", "Remaining", "8 GB", "2 GB"
+   "Ethernet", "Ethernet 1 & 2", "Ethernet 3", "Ethernet 4"
+   "USB", "Remaining", "1-2", "1-1"
+
+You can modify the launch file for your own hardware resource allocation.
+We'll provide some modification methods below.
+For more detail, please refer to `Device Model Parameters <https://projectacrn.github.io/latest/user-guides/acrn-dm-parameters.html>`_
+
+CPU
+===
+
+Modify the number behind ``--cpu-affinity`` in the command acrn-dm.
+The number should be from 0 to max CPU id.
+For example, if you want to run VM with core 1 and 2, it'll be ``--cpu-affinity 1,2``.
+
+Memory
+======
+
+Modify the ``mem_size`` in launch file. This variable will be passed to acrn-dm.
+The possible values are 1024M, 2048M, 4096M, 8192M.
+
+Ethernet
+========
+
+Run ``lspci -Dnn | grep "Ethernet controller"`` to get the ID of Ethernet port.
+
+.. figure:: images/rqi-acrn-ethernet-lspci.png
+
+You'll see 4 ID for each Ethernet port.
+Assign the ID of the port you want to passthrough in the launch file.
+For example, if we want to passthrough Ethernet 3 to the VM:
+
+.. code-block:: bash
+
+  passthru_vpid=(
+  ["ethernet"]="8086 1539"
+  )
+  passthru_bdf=(
+  ["ethernet"]="0000:04:00.0"
+  )
+
+  # Passthrough ETHERNET
+  echo ${passthru_vpid["ethernet"]} > /sys/bus/pci/drivers/pci-stub/new_id
+  echo ${passthru_bdf["ethernet"]} > /sys/bus/pci/devices/${passthru_bdf["ethernet"]}/driver/unbind
+  echo ${passthru_bdf["ethernet"]} > /sys/bus/pci/drivers/pci-stub/bind
+
+  acrn-dm
+  ⋮
+  -s 4,passthru,04/00/0 \
+  ⋮
+
+USB
+===
+
+To passthrough USB to VM, we need to know the ID for each USB first.
+
+.. figure:: images/rqi-acrn-usb-port.png
+
+Then modify the launch file and add the USB ID.
+For example, if you want to passthrough USB 1-2 and 1-4.
+
+.. code-block:: bash
+
+  acrn-dm
+  ⋮
+  -s 8,xhci,1-2,1-4 \
+  ⋮
