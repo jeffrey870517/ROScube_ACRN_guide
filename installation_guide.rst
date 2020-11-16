@@ -438,11 +438,7 @@ Setup Real-Time VM
      wget https://xenomai.org/downloads/xenomai/stable/xenomai-3.1.tar.bz2
      tar xf xenomai-3.1.tar.bz2
      cd xenomai-3.1
-     ./configure --with-core=cobalt \
-         --enable-smp \
-         --enable-pshared \
-         --enable-dlopen-libs \
-         --enable-tls
+     ./configure --with-core=cobalt --enable-smp --enable-pshared 
      make -j`nproc`
      sudo make install
 
@@ -462,7 +458,7 @@ Setup Real-Time VM
      #GRUB_TIMEOUT_STYLE=hidden
      GRUB_TIMEOUT=5 
      ...
-     GRUB_CMDLINE_LINUX="i915.enable_rc6=0 i915.enable_dc=0 i915.disable_power_well=0 i915.enable_execlists=0 i915.powersave=0 processor.max_cstate=0 intel.max_cstate=0 processor_idle.max_cstate=0 intel_idle.max_cstate=0 clocksource=tsc tsc=reliable nmi_watchdog=0 nosoftlockup intel_pstate=disable idle=poll noht nosmap mce=ignore_mce nohalt acpi_irq_nobalance noirqbalance vt.handoff=7 rcu_nocb_poll nohz_full=1 xenomai.allowed_group=1234 nosmt"
+     GRUB_CMDLINE_LINUX="xenomai.allowed_group=1234" 
 
 #. Update GRUB.
 
