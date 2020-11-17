@@ -136,7 +136,7 @@ Configure Hypervisor
 
    .. figure:: images/rqi-acrn-config-select-board.png
 
-#. Select "Scnario Setting" and choose "Load a default scenario".
+#. Select "Scenario Setting" and choose "Load a default scenario".
 
    .. figure:: images/rqi-acrn-config-scenario-settings.png
 
@@ -149,6 +149,8 @@ Configure Hypervisor
    .. figure:: images/rqi-acrn-config-vm0-settings.png
 
 #. Settings "VM1": Enable all the cpu_affinity.
+   You can press ``+`` to increase CPU ID.
+   This doesn't mean to attach all CPU to the VM and CPU number can be adjusted later.
 
    .. figure:: images/rqi-acrn-config-vm1-settings.png
 
