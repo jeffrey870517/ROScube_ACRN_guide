@@ -8,8 +8,8 @@ Getting Started Guide for ACRN Industry Scenario with ROScube-I
 Verified version
 ****************
 
-- Ubuntu version: **18.04**
-- GCC version: **7.5.0**
+- Ubuntu version: **20.04**
+- GCC version: **9.3.0**
 - ACRN-hypervisor branch: **release_2.1**
 - ACRN-Kernel (Service VM kernel): **release_2.1**
 - RT kernel for Ubuntu User OS: **Linux kernel 4.19.59 with Xenomai 3.1**
@@ -38,7 +38,7 @@ Prerequisites
 
 .. figure:: images/rqi-acrn-hw-connection.jpg
 
-* Install Ubuntu 18.04 on ROScube-I.
+* Install Ubuntu 20.04 on ROScube-I.
 
 * Modify the following BIOS settings.
 
@@ -287,7 +287,7 @@ Install User VM
 Before create User VM
 =====================
 
-#. Download Ubuntu image (Here we use `Ubuntu 18.04.5 LTS <https://releases.ubuntu.com/18.04.5/>`_ as example):
+#. Download Ubuntu image (Here we use `Ubuntu 20.04 LTS <https://releases.ubuntu.com/20.04/>`_ as example):
 
 #. Install necessary packages.
 
@@ -339,7 +339,7 @@ Create User VM image
    After install Ubuntu, you can also install some necessary packages, like ssh, vim, ROS 2...etc.
    We'll clone the image for realtime VM, and this can save your time.
 
-#. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
+#. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/>`_
 
 #. Poweroff the VM after complete.
 
@@ -388,7 +388,7 @@ Run User VM
      ./acrn_bridge.sh
      sudo reboot
 
-#. Reboot to ACRN kernel and now you can launch the VM.
+#. **Reboot to ACRN kernel** and now you can launch the VM.
 
    .. code-block:: bash
 
@@ -426,10 +426,17 @@ Setup Real-Time VM
 
    .. code-block:: bash
 
+     # Install necessary packages
      sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev haveged
+     # Since there are some issue to build kernel with gcc-9, use gcc-8 instead.
+     sudo apt install gcc-8
+     sudo ln -fs gcc-8 /usr/bin/gcc
+     # Clone code from GitHub
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
+     # Build
      cd linux-stable-xenomai && make acrn_defconfig
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
+     # Install
      sudo dpkg -i ../linux-headers-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb ../linux-image-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb
 
 #. Install Xenomai library and tools.
@@ -492,7 +499,7 @@ Run Real-Time VM
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_rtos.sh
      chmod +x ./launch_ubuntu_rtos.sh
 
-#. Reboot to ACRN kernel and now you can launch the VM.
+#. **Reboot to ACRN kernel** and now you can launch the VM.
 
    .. code-block:: bash
 
