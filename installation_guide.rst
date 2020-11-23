@@ -350,6 +350,8 @@ Create User VM image
 Run User VM
 ===========
 
+Now back to the native machine and setup environment for launching User VM.
+
 #. Install dependency.
    The origin version of iasl is too old for ACRN and should be upraged.
 
@@ -483,6 +485,8 @@ Setup Real-Time VM
 
 Run Real-Time VM
 ================
+
+Now back to the native machine and setup environment for launching Real-Time VM.
 
 #. Convert KVM image file format.
 
