@@ -10,8 +10,8 @@ Verified version
 
 - Ubuntu version: **20.04**
 - GCC version: **9.3.0**
-- ACRN-hypervisor branch: **release_2.3**
-- ACRN-Kernel (Service VM kernel): **release_2.3**
+- ACRN-hypervisor branch: **release_2.1**
+- ACRN-Kernel (Service VM kernel): **release_2.1**
 - RT kernel for Ubuntu User OS: **Linux kernel 4.19.59 with Xenomai 3.1**
 - HW: `ROScube-I <https://www.adlinktech.com/Products/ROS2_Solution/ROS2_Controller/ROScube-I?lang=en>`_
 
@@ -103,7 +103,7 @@ Setup Environment
    .. code-block:: bash
 
      mkdir ~/acrn && cd ~/acrn
-     git clone https://github.com/projectacrn/acrn-hypervisor -b release_2.3
+     git clone https://github.com/projectacrn/acrn-hypervisor -b release_2.1
      cd acrn-hypervisor
 
 Configure Hypervisor
@@ -200,7 +200,7 @@ Build Service VM kernel
    .. code-block:: bash
 
      cd ~/acrn
-     git clone https://github.com/projectacrn/acrn-kernel -b release_2.3
+     git clone https://github.com/projectacrn/acrn-kernel -b release_2.1
      cd acrn-kernel
 
 #. Restore default ACRN configuration.
