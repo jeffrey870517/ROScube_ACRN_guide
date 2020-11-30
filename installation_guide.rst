@@ -418,6 +418,11 @@ Copy Real-Time VM image
 Setup Real-Time VM
 ==================
 
+.. note::
+
+  The section will guide you how to install Xenomai on ROScube-I.
+  You can contact ADLINK for more detail information.
+
 #. Run the VM and modify your VM hostname.
 
    .. code-block:: bash
