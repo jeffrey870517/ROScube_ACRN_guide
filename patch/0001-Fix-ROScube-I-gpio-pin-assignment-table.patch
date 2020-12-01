@@ -1,0 +1,74 @@
+From 32a2d63ec3b9f0d63b0ff724bdfc1f2c9f1ca35e Mon Sep 17 00:00:00 2001
+From: Edward Liao <edward.liao@adlinktech.com>
+Date: Wed, 14 Oct 2020 15:20:21 +0800
+Subject: [PATCH] Fix ROScube-I gpio pin assignment table
+
+---
+ devicemodel/hw/pci/platform_gsi_info.c | 51 ++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+
+diff --git a/devicemodel/hw/pci/platform_gsi_info.c b/devicemodel/hw/pci/platform_gsi_info.c
+index 0dbefd05..48163dc9 100644
+--- a/devicemodel/hw/pci/platform_gsi_info.c
++++ b/devicemodel/hw/pci/platform_gsi_info.c
+@@ -117,6 +117,57 @@ struct gsi_dev gsi_dev_mapping_tables[] = {
+ 	{"gpio_pin_67",	117},
+ 	{"gpio_pin_68",	118},
+ 	{"gpio_pin_69",	119},
++	{"gpio_pin_70",	120},
++	{"gpio_pin_71",	121},
++	{"gpio_pin_72",	122},
++	{"gpio_pin_73",	123},
++	{"gpio_pin_74",	124},
++	{"gpio_pin_75",	125},
++	{"gpio_pin_76",	126},
++	{"gpio_pin_77",	127},
++	{"gpio_pin_78",	128},
++	{"gpio_pin_79",	129},
++	{"gpio_pin_80",	130},
++	{"gpio_pin_81",	131},
++	{"gpio_pin_82",	132},
++	{"gpio_pin_83",	133},
++	{"gpio_pin_84",	134},
++	{"gpio_pin_85",	135},
++	{"gpio_pin_86",	136},
++	{"gpio_pin_87",	137},
++	{"gpio_pin_88",	138},
++	{"gpio_pin_89",	139},
++	{"gpio_pin_90",	140},
++	{"gpio_pin_91",	141},
++	{"gpio_pin_92",	142},
++	{"gpio_pin_93",	143},
++	{"gpio_pin_94",	144},
++	{"gpio_pin_95",	145},
++	{"gpio_pin_96",	146},
++	{"gpio_pin_97",	147},
++	{"gpio_pin_98",	148},
++	{"gpio_pin_99",	149},
++	{"gpio_pin_100",	150},
++	{"gpio_pin_101",	151},
++	{"gpio_pin_102",	152},
++	{"gpio_pin_103",	153},
++	{"gpio_pin_104",	154},
++	{"gpio_pin_105",	155},
++	{"gpio_pin_106",	156},
++	{"gpio_pin_107",	157},
++	{"gpio_pin_108",	158},
++	{"gpio_pin_109",	159},
++	{"gpio_pin_110",	160},
++	{"gpio_pin_111",	161},
++	{"gpio_pin_112",	162},
++	{"gpio_pin_113",	163},
++	{"gpio_pin_114",	164},
++	{"gpio_pin_115",	165},
++	{"gpio_pin_116",	166},
++	{"gpio_pin_117",	167},
++	{"gpio_pin_118",	168},
++	{"gpio_pin_119",	169},
++	{"gpio_pin_120",	170},
+ };
+ #else
+ /*
+-- 
+2.17.1
+
