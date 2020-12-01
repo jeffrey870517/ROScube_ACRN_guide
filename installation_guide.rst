@@ -174,6 +174,15 @@ Configure Hypervisor
 
 #. Close the browser and stop the process (Ctrl+C).
 
+#. Patch the hypervisor (If you want to use GPIO)
+
+   .. code-block:: bash
+
+     cd ~/acrn/acrn-hypervisor
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/patch/0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
+     git am --abort
+     git am 0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
+
 #. Build hypervisor
 
    .. code-block:: bash
