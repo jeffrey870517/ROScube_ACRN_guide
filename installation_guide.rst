@@ -180,8 +180,7 @@ Configure Hypervisor
 
      cd ~/acrn/acrn-hypervisor
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/patch/0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
-     git am --abort
-     git am 0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
+     git apply 0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
 
 #. Build hypervisor
 
