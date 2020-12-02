@@ -9,7 +9,7 @@ Verified version
 ****************
 
 - Ubuntu version: **18.04**
-- GCC version: **9.3.0**
+- GCC version: **7.5.0**
 - ACRN-hypervisor branch: **release_2.1**
 - ACRN-Kernel (Service VM kernel): **release_2.1**
 - RT kernel for Ubuntu User OS: **Linux kernel 4.19.59 with Xenomai 3.1**
@@ -347,7 +347,7 @@ Create User VM image
    After install Ubuntu, you can also install some necessary packages, like ssh, vim, ROS 2...etc.
    We'll clone the image for realtime VM, and this can save your time.
 
-#. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/>`_
+#. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
 
 #. Poweroff the VM after complete.
 
@@ -443,9 +443,6 @@ Setup Real-Time VM
 
      # Install necessary packages
      sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev haveged
-     # Since there are some issue to build kernel with gcc-9, use gcc-8 instead.
-     sudo apt install gcc-8
-     sudo ln -fs gcc-8 /usr/bin/gcc
      # Clone code from GitHub
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
      # Build
