@@ -8,7 +8,7 @@ Getting Started Guide for ACRN Industry Scenario with ROScube-I
 Verified version
 ****************
 
-- Ubuntu version: **18.04**
+- Ubuntu version: **20.04**
 - GCC version: **9.3.0**
 - ACRN-hypervisor branch: **release_2.1**
 - ACRN-Kernel (Service VM kernel): **release_2.1**
@@ -38,7 +38,7 @@ Prerequisites
 
 .. figure:: images/rqi-acrn-hw-connection.jpg
 
-* Install Ubuntu 18.04 on ROScube-I.
+* Install Ubuntu 20.04 on ROScube-I.
 
 * Modify the following BIOS settings.
 
@@ -295,7 +295,7 @@ Install User VM
 Before create User VM
 =====================
 
-#. Download Ubuntu image (Here we use `Ubuntu 18.04 LTS <https://releases.ubuntu.com/18.04/>`_ as example):
+#. Download Ubuntu image (Here we use `Ubuntu 20.04 LTS <https://releases.ubuntu.com/20.04/>`_ as example):
 
 #. Install necessary packages.
 
