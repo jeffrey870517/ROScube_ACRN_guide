@@ -447,6 +447,7 @@ Setup Real-Time VM
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
      # Build
      cd linux-stable-xenomai && make acrn_defconfig
+     sed -i '/CONFIG_GPIO_VIRTIO/c\CONFIG_GPIO_VIRTIO=m' .config
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
      # Install
      sudo dpkg -i ../linux-headers-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb ../linux-image-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb
