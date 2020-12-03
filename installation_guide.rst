@@ -447,7 +447,7 @@ Setup Real-Time VM
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
      # Build
      cd linux-stable-xenomai
-     cp arch/x86/configs/xenomai_test_defconfig.config .config
+     cp arch/x86/configs/xenomai_test_defconfig .config
      make olddefconfig
      sed -i '/CONFIG_GPIO_VIRTIO/c\CONFIG_GPIO_VIRTIO=m' .config
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
@@ -605,4 +605,52 @@ For example, if you want to passthrough USB 1-2 and 1-4.
   acrn-dm
   ⋮
   -s 8,xhci,1-2,1-4 \
+  ⋮
+
+GPIO
+====
+
+This is the PIN definition of ROScube-I.
+
+.. figure:: images/rqi-pin-definition.png
+
+To pass GPIO to VM, you need to add the following section.
+
+.. code-block:: bash
+
+  acrn-dm
+  ⋮
+  -s X,virtio-gpio,@gpiochip0{<offset>=<alias_name>:<offset>=<alias_name>: ... :} \
+  ⋮
+
+The offset and ping mapping is like following:
+
+.. csv-table::
+   :widths: 5, 10, 15
+
+   "Fn", "GPIO Pin", "In Chip Offset"
+   "DI0", "GPIO220", "72"
+   "DI1", "GPIO221", "73"
+   "DI2", "GPIO222", "74"
+   "DI3", "GPIO223", "75"
+   "DI4", "GPIO224", "76"
+   "DI5", "GPIO225", "77"
+   "DI6", "GPIO226", "78"
+   "DI7", "GPIO227", "79"
+   "DO0", "GPIO253", "105"
+   "DO1", "GPIO254", "106"
+   "DO2", "GPIO255", "107"
+   "DO3", "GPIO256", "108"
+   "DO4", "GPIO257", "109"
+   "DO5", "GPIO258", "110"
+   "DO6", "GPIO259", "111"
+   "DO7", "GPIO260", "112"
+
+For example, if you want to pass DI0 and DO0 to VM:
+
+.. code-block:: bash
+
+  acrn-dm
+  ⋮
+  -s X,virtio-gpio,@gpiochip0{72=gpi0:105=gpo0} \
   ⋮
