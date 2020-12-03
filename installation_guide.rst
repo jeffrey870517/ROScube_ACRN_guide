@@ -353,6 +353,7 @@ Create User VM image
 
    .. code-block:: bash
 
+     sudo apt install git build-essential bison flex libelf-dev libssl-dev liblz4-tool
      # Clone code
      git clone -b release_2.1 https://github.com/projectacrn/acrn-kernel
      cd acrn-kernel
@@ -365,8 +366,8 @@ Create User VM image
      sed -ri "/CONFIG_LOCALVERSION=/s/=.+/=\"-${UOS}\"/g" .config
      # Build and install kernel and modules 
      make all
-     sudo make install
      sudo make modules_install
+     sudo make install
      # Update Grub
      sudo sed -ri "/GRUB_DEFAULT/s/=.+/=\"Advanced options for Ubuntu>Ubuntu, with Linux ${BOOT_DEFAULT}\"/g" /etc/default/grub
      sudo update-grub
