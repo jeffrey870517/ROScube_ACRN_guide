@@ -446,7 +446,9 @@ Setup Real-Time VM
      # Clone code from GitHub
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
      # Build
-     cd linux-stable-xenomai && make acrn_defconfig
+     cd linux-stable-xenomai
+     cp arch/x86/configs/xenomai_test_defconfig.config .config
+     make olddefconfig
      sed -i '/CONFIG_GPIO_VIRTIO/c\CONFIG_GPIO_VIRTIO=m' .config
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
      # Install
@@ -457,6 +459,7 @@ Setup Real-Time VM
 
    .. code-block:: bash
 
+     cd ~
      wget https://xenomai.org/downloads/xenomai/stable/xenomai-3.1.tar.bz2
      tar xf xenomai-3.1.tar.bz2
      cd xenomai-3.1

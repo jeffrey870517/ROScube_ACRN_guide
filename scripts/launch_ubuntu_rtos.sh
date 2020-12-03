@@ -81,7 +81,7 @@ acrn-dm -A -m $mem_size -s 0:0,hostbridge \
   -s 3,virtio-blk,./ROS2SystemRTOS.img \
   -s 4,passthru,06/00/0 \
   -s 5,virtio-net,${tap_id} \
-  -s 6,virtio-gpio,@gpiochip0{76=gpi0:77=gpi1:78=gpi2:79=gpi3:109=gpo0:110=gpo1:111=gpo2:112=gpo3} \
+  -s 6,virtio-gpio,@gpiochip0{72=gpi0:105=gpo0} \
   -s 8,xhci,1-1 \
   -s 9,virtio-console,@stdio:stdio_port \
   $logger_setting \
