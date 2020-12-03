@@ -174,7 +174,7 @@ Configure Hypervisor
 
 #. Close the browser and stop the process (Ctrl+C).
 
-#. Patch the hypervisor (If you want to use GPIO)
+#. Optional: Patch the hypervisor if you want to passthrough GPIO to VM.
 
    .. code-block:: bash
 
@@ -349,6 +349,28 @@ Create User VM image
 
 #. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
 
+#. Optional: Use ACRN kernel if you want to passthrough GPIO to User VM.
+
+   .. code-block:: bash
+
+     # Clone code
+     git clone -b release_2.1 https://github.com/projectacrn/acrn-kernel
+     cd acrn-kernel
+     # Setup kernel config 
+     cp kernel_config_uos .config
+     make olddefconfig
+     export ACRN_KERNEL_UOS=`make kernelversion`
+     export UOS="ROS2SystemUOS"
+     export BOOT_DEFAULT="${ACRN_KERNEL_UOS}-${UOS}"
+     sed -ri "/CONFIG_LOCALVERSION=/s/=.+/=\"-${UOS}\"/g" .config
+     # Build and install kernel and modules 
+     make all
+     sudo make install
+     sudo make modules_install
+     # Update Grub
+     sudo sed -ri "/GRUB_DEFAULT/s/=.+/=\"Advanced options for Ubuntu>Ubuntu, with Linux ${BOOT_DEFAULT}\"/g" /etc/default/grub
+     sudo update-grub
+
 #. Poweroff the VM after complete.
 
    .. code-block:: bash
@@ -452,7 +474,7 @@ Setup Real-Time VM
      sed -i '/CONFIG_GPIO_VIRTIO/c\CONFIG_GPIO_VIRTIO=m' .config
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
      # Install
-     sudo dpkg -i ../linux-headers-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb ../linux-image-4.19.59-xenomai-3.1-acrn+_4.19.59-xenomai-3.1-acrn+-10.00.Custom_amd64.deb
+     sudo dpkg -i ../linux-headers-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb ../linux-image-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb
 
 #. Install Xenomai library and tools.
    For more detail, please refer to `Xenomai Official Documentation <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
@@ -479,7 +501,7 @@ Setup Real-Time VM
 
    .. code-block:: bash
 
-     GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.19.59-xenomai-3.1-acrn+"
+     GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.19.59-xenomai+"
      #GRUB_TIMEOUT_STYLE=hidden
      GRUB_TIMEOUT=5 
      ...
