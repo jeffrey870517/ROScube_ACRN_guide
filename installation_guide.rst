@@ -12,7 +12,7 @@ Verified version
 - GCC version: **7.5.0**
 - ACRN-hypervisor branch: **v2.1**
 - ACRN-Kernel (Service VM kernel): **v2.1**
-- RT kernel for Ubuntu User VM OS: **Linux kernel 4.19.59 with Xenomai 3.1**
+- RT kernel for Ubuntu User VM: **Linux kernel 4.19.59 with Xenomai 3.1**
 - HW: `ROScube-I`_
 
   ADLINK `ROScube-I`_ is a real-time `ROS 2`_-enabled robotic controller based
@@ -180,7 +180,7 @@ Configure Hypervisor
    .. code-block:: bash
 
      cd ~/acrn/acrn-hypervisor
-     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/patch/0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/patch/0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
      git apply 0001-Fix-ROScube-I-gpio-pin-assignment-table.patch
 
 #. Build hypervisor
@@ -427,7 +427,7 @@ the User VM.
 
    .. code-block:: bash
 
-     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_uos.sh
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/scripts/launch_ubuntu_uos.sh
      chmod +x ./launch_ubuntu_uos.sh
 
 #. Set up network and reboot to take effect.
@@ -435,7 +435,7 @@ the User VM.
    .. code-block:: bash
 
      mkdir -p ~/acrn/tools/
-     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/acrn_bridge.sh
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/scripts/acrn_bridge.sh
      chmod +x ./acrn_bridge.sh
      ./acrn_bridge.sh
      sudo reboot
@@ -563,7 +563,7 @@ launching the real-time VM.
 
    .. code-block:: bash
 
-     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_rtos.sh
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/scripts/launch_ubuntu_rtos.sh
      chmod +x ./launch_ubuntu_rtos.sh
 
 #. **Reboot to ACRN kernel** and now you can launch the VM.
