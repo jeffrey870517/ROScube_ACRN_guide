@@ -10,61 +10,76 @@ Verified version
 
 - Ubuntu version: **18.04**
 - GCC version: **7.5.0**
-- ACRN-hypervisor branch: **release_2.1**
-- ACRN-Kernel (Service VM kernel): **release_2.1**
-- RT kernel for Ubuntu User OS: **Linux kernel 4.19.59 with Xenomai 3.1**
-- HW: `ROScube-I <https://www.adlinktech.com/Products/ROS2_Solution/ROS2_Controller/ROScube-I?lang=en>`_
+- ACRN-hypervisor branch: **v2.1**
+- ACRN-Kernel (Service VM kernel): **v2.1**
+- RT kernel for Ubuntu User VM OS: **Linux kernel 4.19.59 with Xenomai 3.1**
+- HW: `ROScube-I`_
+
+  ADLINK `ROScube-I`_ is a real-time `ROS 2`_-enabled robotic controller based
+  on Intel® Xeon® 9th Gen Intel® Core™ i7/i3 and 8th Gen Intel® Core™ i5
+  processors. It features comprehensive I/O connectivity supporting a wide
+  variety of sensors and actuators for unlimited robotic applications.
+
+.. _ROScube-I:
+   https://www.adlinktech.com/Products/ROS2_Solution/ROS2_Controller/ROScube-I?lang=en
+
+.. _ROS 2:
+   https://index.ros.org/doc/ros2/
 
 Architecture
 ************
 
-In the tutorial, we'll guide you how install ACRN Industry Scenario on ROScube-I.
-The scenario will be like the following:
+This tutorial will show you how to install the ACRN Industry Scenario on ROScube-I.
+The scenario is shown here:
 
 .. figure:: images/rqi-acrn-architecture.png
 
-* Service OS: Used to launch User OS and Real-Time OS.
-* User OS: Run ROS 2 application in this OS, like SLAM, navigation.
-* Real-Time OS: Run the critical task in this OS, like base driver.
+* Service VM: Used to launch the User VM and real-time VM.
+* User VM: Run `ROS 2`_ application in this VM, such as for SLAM or navigation.
+* Real-time VM: Run critical tasks in this VM, such as the base driver.
 
 Prerequisites
 *************
 
-* Connect the ROScube-I like the following:
+* Connect the ROScube-I as shown here:
 
   - HDMI for monitor.
   - Network on Ethernet port 1.
   - Keyboard and mouse on USB.
 
-.. figure:: images/rqi-acrn-hw-connection.jpg
+  .. figure:: images/rqi-acrn-hw-connection.jpg
+     :width: 600px
 
 * Install Ubuntu 18.04 on ROScube-I.
 
 * Modify the following BIOS settings.
 
-.. csv-table::
-   :widths: 15, 30, 10
+  .. csv-table::
+     :widths: 15, 30, 10
 
-   "Hyper-threading", "Advanced -> CPU Configuration", "Disabled"
-   "Intel (VMX) Virtualization", "Advanced -> CPU Configuration", "Enabled"
-   "Intel(R) SpeedStep(tm)", "Advanced -> CPU Configuration", "Disabled"
-   "Intel(R) Speed Shift Technology", "Advanced -> CPU configuration", "Disabled"
-   "Turbo Mode", "Advanced -> CPU configuration", "Disabled"
-   "C States", "Advanced -> CPU configuration", "Disabled"
-   "VT-d", "Chipset -> System Agent (SA) Configuration", "Enabled"
-   "DVMT-Pre Allocated", "Chipset -> System Agent (SA) Configuration -> Graphics Configuration", "64M"
+     "Hyper-threading", "Advanced -> CPU Configuration", "Disabled"
+     "Intel (VMX) Virtualization", "Advanced -> CPU Configuration", "Enabled"
+     "Intel(R) SpeedStep(tm)", "Advanced -> CPU Configuration", "Disabled"
+     "Intel(R) Speed Shift Technology", "Advanced -> CPU configuration", "Disabled"
+     "Turbo Mode", "Advanced -> CPU configuration", "Disabled"
+     "C States", "Advanced -> CPU configuration", "Disabled"
+     "VT-d", "Chipset -> System Agent (SA) Configuration", "Enabled"
+     "DVMT-Pre Allocated", "Chipset -> System Agent (SA) Configuration -> Graphics Configuration", "64M"
+
+.. rst-class:: numbered-step
 
 Install ACRN hypervisor
 ***********************
 
-Setup Environment
-=================
+Set up Environment
+==================
 
-#. Open ``/etc/default/grub/`` and add ``idle=nomwait intel_pstate=disable`` in the end of GRUB_CMDLINE_LINUX_DEFAULT.
+#. Open ``/etc/default/grub/`` and add ``idle=nomwait intel_pstate=disable``
+   to the end of ``GRUB_CMDLINE_LINUX_DEFAULT``.
 
    .. figure:: images/rqi-acrn-grub.png
 
-#. Update grub and then reboot.
+#. Update GRUB and then reboot.
 
    .. code-block:: bash
 
@@ -76,26 +91,10 @@ Setup Environment
    .. code-block:: bash
 
      sudo apt update
-     sudo apt install -y gcc \
-       git \
-       make \
-       gnu-efi \
-       libssl-dev \
-       libpciaccess-dev \
-       uuid-dev \
-       libsystemd-dev \
-       libevent-dev \
-       libxml2-dev \
-       libusb-1.0-0-dev \
-       python3 \
-       python3-pip \
-       libblkid-dev \
-       e2fslibs-dev \
-       pkg-config \
-       libnuma-dev \
-       liblz4-tool \
-       flex \
-       bison
+     sudo apt install -y gcc git make gnu-efi libssl-dev libpciaccess-dev \
+       uuid-dev libsystemd-dev libevent-dev libxml2-dev \
+       libusb-1.0-0-dev python3 python3-pip libblkid-dev \
+       e2fslibs-dev pkg-config libnuma-dev liblz4-tool flex bison
      sudo pip3 install kconfiglib
 
 #. Get code from GitHub.
@@ -116,12 +115,13 @@ Configure Hypervisor
      sudo apt install -y cpuid msr-tools
      cd ~/acrn/acrn-hypervisor/misc/acrn-config/target/
      sudo python3 board_parser.py ros-cube-cfl
-     cp ~/acrn/acrn-hypervisor/misc/acrn-config/target/out/ros-cube-cfl.xml ~/acrn/acrn-hypervisor/misc/acrn-config/xmls/board-xmls/
+     cp ~/acrn/acrn-hypervisor/misc/acrn-config/target/out/ros-cube-cfl.xml \
+       ~/acrn/acrn-hypervisor/misc/acrn-config/xmls/board-xmls/
 
-#. Run ACRN configuration app and it'll open a browser page.
+#. Run ACRN configuration app and it will open a browser page.
 
    .. code-block:: bash
- 
+
      cd ~/acrn/acrn-hypervisor/misc/acrn-config/config_app
      sudo pip3 install -r requirements
      python3 app.py
@@ -149,12 +149,13 @@ Configure Hypervisor
    .. figure:: images/rqi-acrn-config-vm0-settings.png
 
 #. Settings "VM1": Enable all the cpu_affinity.
-   You can press ``+`` to increase CPU ID.
-   This doesn't mean to attach all CPU to the VM and CPU number can be adjusted later.
+   You can press :kbd:`+` to increase CPU ID.
+   This doesn't mean to attach all CPUs to the VM. The CPU number can be
+   adjusted later.
 
    .. figure:: images/rqi-acrn-config-vm1-settings.png
 
-#. Settings "VM2": Setup RT flags and enable all the cpu_affinity.
+#. Settings "VM2": Set up RT flags and enable all the cpu_affinity.
 
    .. figure:: images/rqi-acrn-config-vm2-settings1.png
 
@@ -187,7 +188,10 @@ Configure Hypervisor
    .. code-block:: bash
 
      cd ~/acrn/acrn-hypervisor
-     make all BOARD_FILE=misc/acrn-config/xmls/board-xmls/ros-cube-cfl.xml SCENARIO_FILE=misc/acrn-config/xmls/config-xmls/ros-cube-cfl/user_defined/industry_ROS2SystemOS.xml RELEASE=0
+     make all \
+        BOARD_FILE=misc/acrn-config/xmls/board-xmls/ros-cube-cfl.xml \
+        SCENARIO_FILE=misc/acrn-config/xmls/config-xmls/ros-cube-cfl/user_defined/industry_ROS2SystemOS.xml \
+        RELEASE=0
 
 #. Install hypervisor
 
@@ -196,6 +200,8 @@ Configure Hypervisor
      sudo make install
      sudo mkdir /boot/acrn
      sudo cp ~/acrn/acrn-hypervisor/build/hypervisor/acrn.bin /boot/acrn/
+
+.. rst-class:: numbered-step
 
 Install Service VM kernel
 *************************
@@ -214,22 +220,22 @@ Build Service VM kernel
 #. Restore default ACRN configuration.
 
    .. code-block:: bash
- 
+
      cp kernel_config_uefi_sos .config
      make olddefconfig
      sed -ri '/CONFIG_LOCALVERSION=/s/=.+/="-ROS2SystemSOS"/g' .config
      sed -i '/CONFIG_PINCTRL_CANNONLAKE/c\CONFIG_PINCTRL_CANNONLAKE=m' .config
 
-#. Build Service VM kernel. It'll take some time.
+#. Build Service VM kernel. It will take some time.
 
    .. code-block:: bash
- 
+
      make all
 
 #. Install kernel and module.
 
    .. code-block:: bash
- 
+
      sudo make modules_install
      sudo cp arch/x86/boot/bzImage /boot/acrn-ROS2SystemSOS
 
@@ -242,15 +248,16 @@ Update Grub
 
      sudo blkid /dev/sda*
 
-   .. note:: The UUID and PARTUUID we needs should be ``/dev/sda2``, which is ``TYPE="ext4"``.
-             Just like the following graph:
-   
+   .. note:: The UUID and PARTUUID we need should be ``/dev/sda2``, which is ``TYPE="ext4"``,
+             as shown in the following graph:
+
    .. figure:: images/rqi-acrn-blkid.png
 
-#. Update ``/etc/grub.d/40_custom`` as below. Remember to edit <UUID> and <PARTUUID> to yours.
+#. Update ``/etc/grub.d/40_custom`` as below. Remember to edit
+   ``<UUID>`` and ``<PARTUUID>`` to your system's values.
 
    .. code-block:: bash
- 
+
      menuentry "ACRN Multiboot Ubuntu Service VM" --id ubuntu-service-vm {
        load_video
        insmod gzio
@@ -262,32 +269,35 @@ Update Grub
        multiboot2 /boot/acrn/acrn.bin  root=PARTUUID="<PARTUUID>"
        module2 /boot/acrn-ROS2SystemSOS Linux_bzImage
      }
-  
+
    .. figure:: images/rqi-acrn-grun-40_custom.png
 
-#. Update ``/etc/default/grub`` to make grub menu visible and load Service VM as default.
+#. Update ``/etc/default/grub`` to make GRUB menu visible and load Service VM as default.
 
    .. code-block:: bash
 
      GRUB_DEFAULT=ubuntu-service-vm
      #GRUB_TIMEOUT_STYLE=hidden
-     GRUB_TIMEOUT=5 
+     GRUB_TIMEOUT=5
 
-#. Then update grub and reboot.
+#. Then update GRUB and reboot.
 
    .. code-block:: bash
 
      sudo update-grub
      sudo reboot
 
-#. ``ACRN Multiboot Ubuntu Service VM`` entry will be shown grub menu and choose it to load ACRN.
-   You can check whether the installation is successful or not by dmesg.
+#. ``ACRN Multiboot Ubuntu Service VM`` entry will be shown in the GRUB
+   menu. Choose it to load ACRN.  You can check that the installation is
+   successful by using ``dmesg``.
 
    .. code-block:: bash
 
      sudo dmesg | grep ACRN
-  
+
    .. figure:: images/rqi-acrn-dmesg.png
+
+.. rst-class:: numbered-step
 
 Install User VM
 ***************
@@ -295,21 +305,21 @@ Install User VM
 Before create User VM
 =====================
 
-#. Download Ubuntu image (Here we use `Ubuntu 18.04 LTS <https://releases.ubuntu.com/18.04/>`_ as example):
+#. Download Ubuntu image (Here we use `Ubuntu 18.04 LTS
+   <https://releases.ubuntu.com/18.04/>`_ for example):
 
 #. Install necessary packages.
 
    .. code-block:: bash
 
-     sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virt-manager ovmf
-     sudo reboot
+     sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system \
+       bridge-utils virt-manager ovmf sudo reboot
 
 Create User VM image
 ====================
 
-.. note::
-
-  Please create User VM image on **native Linux kernel**, not ACRN kernel, or you'll get the error message.
+.. note:: Reboot into the **native Linux kernel** (not the ACRN kernel)
+   and create User VM image.
 
 #. Start virtual machine manager application.
 
@@ -325,9 +335,9 @@ Create User VM image
 
    .. figure:: images/rqi-acrn-kvm-choose-iso.png
 
-#. Select CPU and RAM for the VM.
-   You can modify as high as you can to accelerate the installation time.
-   The settings here is not related to the resource of UOS on ACRN, which can be decided later.
+#. Select CPU and RAM for the VM.  You can modify as high as you can to
+   accelerate the installation time.  The settings here are not related to
+   the resource of the User VM on ACRN, which can be decided later.
 
    .. figure:: images/rqi-acrn-kvm-cpu-ram.png
 
@@ -344,35 +354,43 @@ Create User VM image
    .. figure:: images/rqi-acrn-kvm-firmware.png
 
 #. Now you'll see the installation page of Ubuntu.
-   After install Ubuntu, you can also install some necessary packages, like ssh, vim, ROS 2...etc.
-   We'll clone the image for realtime VM, and this can save your time.
+   After installing Ubuntu, you can also install some necessary
+   packages, such as ssh, vim, and ROS 2.
+   We'll clone the image for real-time VM to save time.
 
-#. To install ROS 2, please refer to `Installing ROS 2 via Debian Packages <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
+#. To install ROS 2, refer to `Installing ROS 2 via Debian Packages
+   <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
 
 #. Optional: Use ACRN kernel if you want to passthrough GPIO to User VM.
 
    .. code-block:: bash
 
      sudo apt install git build-essential bison flex libelf-dev libssl-dev liblz4-tool
+
      # Clone code
      git clone -b release_2.1 https://github.com/projectacrn/acrn-kernel
      cd acrn-kernel
-     # Setup kernel config 
+
+     # Set up kernel config
      cp kernel_config_uos .config
      make olddefconfig
      export ACRN_KERNEL_UOS=`make kernelversion`
      export UOS="ROS2SystemUOS"
      export BOOT_DEFAULT="${ACRN_KERNEL_UOS}-${UOS}"
      sed -ri "/CONFIG_LOCALVERSION=/s/=.+/=\"-${UOS}\"/g" .config
-     # Build and install kernel and modules 
+
+     # Build and install kernel and modules
      make all
      sudo make modules_install
      sudo make install
+
      # Update Grub
-     sudo sed -ri "/GRUB_DEFAULT/s/=.+/=\"Advanced options for Ubuntu>Ubuntu, with Linux ${BOOT_DEFAULT}\"/g" /etc/default/grub
+     sudo sed -ri \
+       "/GRUB_DEFAULT/s/=.+/=\"Advanced options for Ubuntu>Ubuntu, with Linux ${BOOT_DEFAULT}\"/g" \
+       /etc/default/grub
      sudo update-grub
 
-#. Poweroff the VM after complete.
+#. When that completes, poweroff the VM.
 
    .. code-block:: bash
 
@@ -381,10 +399,11 @@ Create User VM image
 Run User VM
 ===========
 
-Now back to the native machine and setup environment for launching User VM.
+Now back to the native machine to set up the environment for launching
+the User VM.
 
-#. Install dependency.
-   The origin version of iasl is too old for ACRN and should be upraged.
+#. Install ``iasl`` and then manually update to a newer version of the
+   ``iasl`` binary than what's included with Ubuntu 18.04:
 
    .. code-block:: bash
 
@@ -409,9 +428,9 @@ Now back to the native machine and setup environment for launching User VM.
    .. code-block:: bash
 
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/master/scripts/launch_ubuntu_uos.sh
-     chmod +x ./launch_ubuntu_uos.sh 
+     chmod +x ./launch_ubuntu_uos.sh
 
-#. Setup network and reboot to take effect.
+#. Set up network and reboot to take effect.
 
    .. code-block:: bash
 
@@ -428,31 +447,30 @@ Now back to the native machine and setup environment for launching User VM.
      cd ~/acrn/uosVM
      sudo ./launch_ubuntu_uos.sh
 
-Install Real-Time VM
+.. rst-class:: numbered-step
+
+Install real-time VM
 ********************
 
-Copy Real-Time VM image
+Copy real-time VM image
 =======================
 
-.. note::
+.. note:: Reboot into the **native Linux kernel** (not the ACRN kernel)
+   and create User VM image.
 
-  Please create Real-Time VM image on **native Linux kernel**, not ACRN kernel, or you'll get the error message.
-
-#. Clone Real-Time VM from User VM. (Right click User VM and then clone)
+#. Clone real-time VM from User VM. (Right-click User VM and then clone)
 
    .. figure:: images/rqi-acrn-rtos-clone.png
 
-#. You'll see the Real-Time VM is ready.
+#. You'll see the real-time VM is ready.
 
    .. figure:: images/rqi-acrn-rtos-ready.png
 
-Setup Real-Time VM
-==================
+Set up real-time VM
+===================
 
-.. note::
-
-  The section will guide you how to install Xenomai on ROScube-I.
-  You can contact ADLINK for more detail information.
+.. note:: The section will show you how to install Xenomai on ROScube-I.
+   If needed, contact ADLINK for more information.
 
 #. Run the VM and modify your VM hostname.
 
@@ -466,19 +484,24 @@ Setup Real-Time VM
 
      # Install necessary packages
      sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev haveged
+
      # Clone code from GitHub
      git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
+
      # Build
      cd linux-stable-xenomai
      cp arch/x86/configs/xenomai_test_defconfig .config
      make olddefconfig
      sed -i '/CONFIG_GPIO_VIRTIO/c\CONFIG_GPIO_VIRTIO=m' .config
      CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
-     # Install
-     sudo dpkg -i ../linux-headers-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb ../linux-image-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb
 
-#. Install Xenomai library and tools.
-   For more detail, please refer to `Xenomai Official Documentation <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
+     # Install
+     sudo dpkg -i ../linux-headers-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb \
+       ../linux-image-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb
+
+#. Install Xenomai library and tools.  For more details, refer to
+   `Xenomai Official Documentation
+   <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
 
    .. code-block:: bash
 
@@ -486,11 +509,11 @@ Setup Real-Time VM
      wget https://xenomai.org/downloads/xenomai/stable/xenomai-3.1.tar.bz2
      tar xf xenomai-3.1.tar.bz2
      cd xenomai-3.1
-     ./configure --with-core=cobalt --enable-smp --enable-pshared 
+     ./configure --with-core=cobalt --enable-smp --enable-pshared
      make -j`nproc`
      sudo make install
 
-#. Allow non-root user to run Xenomai
+#. Allow non-root user to run Xenomai.
 
    .. code-block:: bash
 
@@ -504,9 +527,9 @@ Setup Real-Time VM
 
      GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.19.59-xenomai+"
      #GRUB_TIMEOUT_STYLE=hidden
-     GRUB_TIMEOUT=5 
+     GRUB_TIMEOUT=5
      ...
-     GRUB_CMDLINE_LINUX="xenomai.allowed_group=1234" 
+     GRUB_CMDLINE_LINUX="xenomai.allowed_group=1234"
 
 #. Update GRUB.
 
@@ -520,10 +543,11 @@ Setup Real-Time VM
 
      sudo poweroff
 
-Run Real-Time VM
+Run real-time VM
 ================
 
-Now back to the native machine and setup environment for launching Real-Time VM.
+Now back to the native machine and we'll set up the environment for
+launching the real-time VM.
 
 #. Convert KVM image file format.
 
@@ -531,7 +555,9 @@ Now back to the native machine and setup environment for launching Real-Time VM.
 
      mkdir -p ~/acrn/rtosVM
      cd ~/acrn/rtosVM
-     sudo qemu-img convert -f qcow2 -O raw /var/lib/libvirt/images/ROS2SystemRTOS.qcow2 ./ROS2SystemRTOS.img
+     sudo qemu-img convert -f qcow2 \
+       -O raw /var/lib/libvirt/images/ROS2SystemRTOS.qcow2 \
+       ./ROS2SystemRTOS.img
 
 #. Create a new launch file
 
@@ -547,18 +573,17 @@ Now back to the native machine and setup environment for launching Real-Time VM.
      cd ~/acrn/rtosVM
      sudo ./launch_ubuntu_rtos.sh
 
-.. note::
+.. note:: Use ``poweroff`` instead of ``reboot`` in the real-time VM.
+   In ACRN design, rebooting the real-time VM will also reboot the whole
+   system.
 
-  Please use poweroff instead of reboot in Real-Time VM.
-  In ACRN design, the system will also reboot while rebooting Real-Time VM.
+Customizing the launch file
+***************************
 
-About the Launch File
-*********************
-
-The launch file in this tutorial have the following hardware resource allocation.
+The launch file in this tutorial has the following hardware resource allocation.
 
 .. csv-table::
-   :header: "Resource", "Service VM", "User VM", "Real-Time VM"
+   :header: "Resource", "Service VM", "User VM", "Real-time VM"
    :widths: 15, 15, 15, 15
 
    "CPU", "0", "1,2,3", "4,5"
@@ -568,20 +593,20 @@ The launch file in this tutorial have the following hardware resource allocation
 
 You can modify the launch file for your own hardware resource allocation.
 We'll provide some modification methods below.
-For more detail, please refer to `Device Model Parameters <https://projectacrn.github.io/latest/user-guides/acrn-dm-parameters.html>`_
+For more detail, see :ref:`acrn-dm_parameters`.
 
 CPU
 ===
 
-Modify the number behind ``--cpu-affinity`` in the command acrn-dm.
-The number should be from 0 to max CPU id.
-For example, if you want to run VM with core 1 and 2, it'll be ``--cpu-affinity 1,2``.
+Modify the ``--cpu-affinity`` value in the command ``acrn-dm`` command.
+The number should be between 0 and max CPU ID.
+For example, if you want to run VM with core 1 and 2, use ``--cpu-affinity 1,2``.
 
 Memory
 ======
 
-Modify the ``mem_size`` in launch file. This variable will be passed to acrn-dm.
-The possible values are 1024M, 2048M, 4096M, 8192M.
+Modify the ``mem_size`` in launch file. This variable will be passed to
+``acrn-dm``.  The possible values are 1024M, 2048M, 4096M, and 8192M.
 
 Ethernet
 ========
@@ -590,7 +615,7 @@ Run ``lspci -Dnn | grep "Ethernet controller"`` to get the ID of Ethernet port.
 
 .. figure:: images/rqi-acrn-ethernet-lspci.png
 
-You'll see 4 ID for each Ethernet port.
+You'll see 4 IDs, one for each Ethernet port.
 Assign the ID of the port you want to passthrough in the launch file.
 For example, if we want to passthrough Ethernet 3 to the VM:
 
@@ -646,7 +671,7 @@ To pass GPIO to VM, you need to add the following section.
   -s X,virtio-gpio,@gpiochip0{<offset>=<alias_name>:<offset>=<alias_name>: ... :} \
   ⋮
 
-The offset and ping mapping is like following:
+The offset and pin mapping is as shown here:
 
 .. csv-table::
    :widths: 5, 10, 15
