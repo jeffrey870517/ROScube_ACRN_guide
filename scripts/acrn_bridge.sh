@@ -16,23 +16,28 @@
 # more details.
 # ---------------------------------------------------------------------------
 
-acrn_net=/etc/init.d/acrn-net
-if [ ! -f ${acrn_net} ]; then
-  sudo touch ${acrn_net}
+acrn_net=acrn_net
+acrn_net_sh=/opt/${acrn_net}.sh
+acrn_net_service=/etc/systemd/system/${acrn_net}.service
+if [ ! -f ${acrn_net_service} ]; then
+  sudo touch ${acrn_net_service}
+  echo "
+[Unit]
+Description=Create ACRN bridge network
+
+[Service]
+ExecStart=/opt/acrn_net.sh
+
+[Install]
+WantedBy=multi-user.target
+" | sudo tee ${acrn_net_service} > /dev/null
+fi
+
+if [ ! -f ${acrn_net_sh} ]; then
+  sudo touch ${acrn_net_sh}
   echo "#! /bin/sh
 
-### BEGIN INIT INFO
-# Provides:             acrn-net
-# Required-Start:       $syslog $network
-# Required-Stop:        $syslog $network
-# Default-Start:        2 3 4 5
-# Default-Stop:
-# Short-Description:    ADLINK ROS2SystemOS ACRN Virt-Net Settings
-### END INIT INFO
-
 set -e
-
-# /etc/init.d/acrn_net: start and stop real-time configuration daemon
 
 br=$(brctl show | grep acrn-br0)
 br=${br-:0:6}
@@ -47,8 +52,9 @@ if ! echo $br | grep -q "acrn-br0"; then
 fi
 
 exit 0
-" | sudo tee ${acrn_net} > /dev/null
+" | sudo tee ${acrn_net_sh} > /dev/null
 
-sudo chmod +x ${acrn_net}
-sudo update-rc.d acrn-net defaults
+sudo chmod +x ${acrn_net_sh}
+sudo systemctl enable ${acrn_net}
+sudo systemctl start ${acrn_net}
 fi

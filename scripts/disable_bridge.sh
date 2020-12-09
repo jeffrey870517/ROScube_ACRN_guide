@@ -16,8 +16,13 @@
 # more details.
 # ---------------------------------------------------------------------------
 
-acrn_net=/etc/init.d/acrn-net
-if [ -f ${acrn_net} ]; then
-  sudo update-rc.d -f acrn_net remove
-  sudo rm ${acrn_net}
+acrn_net=acrn_net
+acrn_net_sh=/opt/${acrn_net}.sh
+acrn_net_service=/etc/systemd/system/${acrn_net}.service
+if [ -f ${acrn_net_service} ]; then
+  sudo systemctl disable ${acrn_net}
+  sudo rm ${acrn_net_service}
+fi
+if [ -f ${acrn_net_sh} ]; then
+  sudo rm ${acrn_net_sh}
 fi
