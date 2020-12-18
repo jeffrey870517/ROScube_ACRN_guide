@@ -12,7 +12,7 @@ Verified version
 - GCC version: **7.5.0**
 - ACRN-hypervisor branch: **v2.1**
 - ACRN-Kernel (Service VM kernel): **v2.1**
-- RT kernel for Ubuntu User VM: **Linux kernel 4.19.59 with Xenomai 3.1**
+- RT kernel for Ubuntu User VM OS: **Linux kernel 4.19.59 with Xenomai 3.1**
 - HW: `ROScube-I`_
 
   ADLINK `ROScube-I`_ is a real-time `ROS 2`_-enabled robotic controller based
@@ -313,7 +313,8 @@ Before create User VM
    .. code-block:: bash
 
      sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system \
-       bridge-utils virt-manager ovmf sudo reboot
+       bridge-utils virt-manager ovmf
+     sudo reboot
 
 Create User VM image
 ====================
@@ -402,12 +403,12 @@ Run User VM
 Now back to the native machine to set up the environment for launching
 the User VM.
 
-#. Install ``iasl`` and then manually update to a newer version of the
-   ``iasl`` binary than what's included with Ubuntu 18.04:
+#. Manually fetch and install the ``iasl`` binary to ``/usr/bin`` (where
+   ACRN expects it) with a newer version of the
+   than what's included with Ubuntu 18.04:
 
    .. code-block:: bash
 
-     sudo apt install iasl
      cd /tmp
      wget https://acpica.org/sites/acpica/files/acpica-unix-20191018.tar.gz
      tar zxvf acpica-unix-20191018.tar.gz
@@ -435,6 +436,7 @@ the User VM.
    .. code-block:: bash
 
      mkdir -p ~/acrn/tools/
+     cd ~/acrn/tools
      wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/scripts/acrn_bridge.sh
      chmod +x ./acrn_bridge.sh
      ./acrn_bridge.sh
@@ -470,7 +472,10 @@ Set up real-time VM
 ===================
 
 .. note:: The section will show you how to install Xenomai on ROScube-I.
-   If needed, contact ADLINK for more information.
+   If help is needed, `contact ADLINK
+   <https://go.adlinktech.com/ROS-Inquiry_LP.html>`_ for more
+   information, or ask a question on the `ACRN users mailing list
+   <https://lists.projectacrn.org/g/acrn-users>`_
 
 #. Run the VM and modify your VM hostname.
 
