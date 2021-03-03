@@ -63,10 +63,240 @@ Please refer to `Install Service VM kernel`_ in installation_guide.rst.
 Install real-time VM
 ********************
 
-Please refer to `Install real-time VM`_ in installation_guide.rst.
+Before install real-time VM
+=====================
 
-.. _Install real-time VM:
-   https://github.com/Adlink-ROS/ROScube_ACRN_guide/blob/master/installation_guide.rst#install-real-time-vm
+#. Download Ubuntu image (Here we use `Ubuntu 18.04 LTS
+   <https://releases.ubuntu.com/18.04/>`_ for example):
+
+#. Install necessary packages.
+
+   .. code-block:: bash
+
+     sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system \
+       bridge-utils virt-manager ovmf
+     sudo reboot
+
+Create real-time VM image
+====================
+
+.. note:: Reboot into the **native Linux kernel** (not the ACRN kernel)
+   and create User VM image.
+
+#. Start virtual machine manager application.
+
+   .. code-block:: bash
+
+     sudo virt-manager
+
+#. Create a new virtual machine.
+
+   .. figure:: images/rqi-acrn-kvm-new-vm.png
+
+#. Select your ISO image path.
+
+   .. figure:: images/rqi-acrn-kvm-choose-iso.png
+
+#. Select CPU and RAM for the VM.  You can modify as high as you can to
+   accelerate the installation time.  The settings here are not related to
+   the resource of the User VM on ACRN, which can be decided later.
+
+   .. figure:: images/rqi-acrn-kvm-cpu-ram.png
+
+#. Select disk size you want. **Note that this can't be modified after creating image!**
+
+   .. figure:: images/rqi-acrn-kvm-storage.png
+
+#. Edit image name to "ROS2SystemRTOS" and select "Customize configuration before install".
+
+   .. figure:: images/rqi-acrn-kvm-name-rtvm.png
+
+#. Select correct Firmware, apply it, and Begin Installation.
+
+   .. figure:: images/rqi-acrn-kvm-firmware-rtvm.png
+
+#. Now you'll see the installation page of Ubuntu.
+   After installing Ubuntu, you can also install some necessary
+   packages, such as ssh, vim, and ROS 2.
+
+#. To install ROS 2, refer to `Installing ROS 2 via Debian Packages
+   <https://index.ros.org/doc/ros2/Installation/Dashing/Linux-Install-Debians/>`_
+
+#. Optional: Use ACRN kernel if you want to passthrough GPIO to User VM.
+
+   .. code-block:: bash
+
+     sudo apt install git build-essential bison flex libelf-dev libssl-dev liblz4-tool
+
+     # Clone code
+     git clone -b release_2.1 https://github.com/projectacrn/acrn-kernel
+     cd acrn-kernel
+
+     # Set up kernel config
+     cp kernel_config_uos .config
+     make olddefconfig
+     export ACRN_KERNEL_RTOS=`make kernelversion`
+     export RTOS="ROS2SystemRTOS"
+     export BOOT_DEFAULT="${ACRN_KERNEL_RTOS}-${RTOS}"
+     sed -ri "/CONFIG_LOCALVERSION=/s/=.+/=\"-${RTOS}\"/g" .config
+
+     # Build and install kernel and modules
+     make all
+     sudo make modules_install
+     sudo make install
+
+     # Update Grub
+     sudo sed -ri \
+       "/GRUB_DEFAULT/s/=.+/=\"Advanced options for Ubuntu>Ubuntu, with Linux ${BOOT_DEFAULT}\"/g" \
+       /etc/default/grub
+     sudo update-grub
+
+#. When that completes, poweroff the VM.
+
+   .. code-block:: bash
+
+     sudo poweroff
+
+Set up real-time VM
+===================
+
+.. note:: The section will show you how to install Xenomai on ROScube-I.
+   If help is needed, `contact ADLINK
+   <https://go.adlinktech.com/ROS-Inquiry_LP.html>`_ for more
+   information, or ask a question on the `ACRN users mailing list
+   <https://lists.projectacrn.org/g/acrn-users>`_
+
+#. Run the VM and modify your VM hostname.
+
+   .. code-block:: bash
+
+     hostnamectl set-hostname ros-RTOS
+
+#. Install Xenomai kernel.
+
+   .. code-block:: bash
+
+     # Install necessary packages
+     sudo apt install git build-essential bison flex kernel-package libelf-dev libssl-dev haveged
+
+     # Clone code from GitHub
+     git clone -b F/4.19.59/base/ipipe/xenomai_3.1 https://github.com/intel/linux-stable-xenomai
+
+     # Build
+     cd linux-stable-xenomai
+     cp arch/x86/configs/xenomai_test_defconfig .config
+     make olddefconfig
+     sed -i '/CONFIG_GPIO_VIRTIO/c\CONFIG_GPIO_VIRTIO=m' .config
+     CONCURRENCY_LEVEL=$(nproc) make-kpkg --rootcmd fakeroot --initrd kernel_image kernel_headers
+
+     # Install
+     sudo dpkg -i ../linux-headers-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb \
+       ../linux-image-4.19.59-xenomai+_4.19.59-xenomai+-10.00.Custom_amd64.deb
+
+#. Install Xenomai library and tools.  For more details, refer to
+   `Xenomai Official Documentation
+   <https://gitlab.denx.de/Xenomai/xenomai/-/wikis/Installing_Xenomai_3#library-install>`_.
+
+   .. code-block:: bash
+
+     cd ~
+     wget https://xenomai.org/downloads/xenomai/stable/xenomai-3.1.tar.bz2
+     tar xf xenomai-3.1.tar.bz2
+     cd xenomai-3.1
+     ./configure --with-core=cobalt --enable-smp --enable-pshared
+     make -j`nproc`
+     sudo make install
+
+#. Allow non-root user to run Xenomai.
+
+   .. code-block:: bash
+
+     sudo addgroup xenomai --gid 1234
+     sudo addgroup root xenomai
+     sudo usermod -a -G xenomai $USER
+
+#. Update ``/etc/default/grub``.
+
+   .. code-block:: bash
+
+     GRUB_DEFAULT="Advanced options for Ubuntu>Ubuntu, with Linux 4.19.59-xenomai+"
+     #GRUB_TIMEOUT_STYLE=hidden
+     GRUB_TIMEOUT=5
+     ...
+     GRUB_CMDLINE_LINUX="xenomai.allowed_group=1234"
+
+#. Update GRUB.
+
+   .. code-block:: bash
+
+     sudo update-grub
+
+#. Poweroff the VM.
+
+   .. code-block:: bash
+
+     sudo poweroff
+
+
+Run real-time VM
+================
+
+Now back to the native machine and we'll set up the environment for
+launching the real-time VM.
+
+#. Manually fetch and install the ``iasl`` binary to ``/usr/bin`` (where
+   ACRN expects it) with a newer version of the
+   than what's included with Ubuntu 18.04:
+
+   .. code-block:: bash
+
+     cd /tmp
+     wget https://acpica.org/sites/acpica/files/acpica-unix-20191018.tar.gz
+     tar zxvf acpica-unix-20191018.tar.gz
+     cd acpica-unix-20191018
+     make clean && make iasl
+     sudo cp ./generate/unix/bin/iasl /usr/sbin/
+
+#. Convert KVM image file format.
+
+   .. code-block:: bash
+
+     mkdir -p ~/acrn/rtosVM
+     cd ~/acrn/rtosVM
+     sudo qemu-img convert -f qcow2 \
+       -O raw /var/lib/libvirt/images/ROS2SystemRTOS.qcow2 \
+       ./ROS2SystemRTOS.img
+
+#. Create a new launch file
+
+   .. code-block:: bash
+
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/scripts/launch_ubuntu_rtos.sh
+     chmod +x ./launch_ubuntu_rtos.sh
+
+#. Set up network and reboot to take effect.
+
+   .. code-block:: bash
+
+     mkdir -p ~/acrn/tools/
+     cd ~/acrn/tools
+     wget https://raw.githubusercontent.com/Adlink-ROS/ROScube_ACRN_guide/v2.1/scripts/acrn_bridge.sh
+     chmod +x ./acrn_bridge.sh
+     ./acrn_bridge.sh
+     sudo reboot
+
+#. **Reboot to ACRN kernel** and now you can launch the VM.
+
+   .. code-block:: bash
+
+     cd ~/acrn/rtosVM
+     sudo ./launch_ubuntu_rtos.sh
+
+.. note:: Use ``poweroff`` instead of ``reboot`` in the real-time VM.
+   In ACRN design, rebooting the real-time VM will also reboot the whole
+   system.
+
+.. rst-class:: numbered-step
 
 Install User VM Windows
 ***********************
@@ -306,7 +536,13 @@ Prepare an OVMF file
       cp ./ROScube-I_OVMF.zip ~/acrn/uosWinVM
       unzip ROScube-I_OVMF.zip
 
-   - *Remarks*: **ROScube-I_OVMF.zip** doesn't exist in this Repo. If you need this file, please contact ADLINK.
+   .. note::
+   
+      **ROScube-I_OVMF.zip** doesn't exist in this Repo.
+      If help is needed, `contact ADLINK
+      <https://go.adlinktech.com/ROS-Inquiry_LP.html>`_ for more
+      information, or ask a question on the `ACRN users mailing list
+      <https://lists.projectacrn.org/g/acrn-users>`_
 
 #. Return **OK** means the file was not broken.
 

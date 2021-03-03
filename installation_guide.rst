@@ -66,7 +66,7 @@ Prerequisites
      "VT-d", "Chipset -> System Agent (SA) Configuration", "Enabled"
      "DVMT-Pre Allocated", "Chipset -> System Agent (SA) Configuration -> Graphics Configuration", "64M"
 
-.. rst-class:: numbered-step
+.. rst-class:: numbered-step 
 
 Install ACRN hypervisor
 ***********************
@@ -74,7 +74,7 @@ Install ACRN hypervisor
 Set up Environment
 ==================
 
-#. Open ``/etc/default/grub/`` and add ``idle=nomwait intel_pstate=disable``
+#. Open ``/etc/default/grub`` and add ``idle=nomwait intel_pstate=disable``
    to the end of ``GRUB_CMDLINE_LINUX_DEFAULT``.
 
    .. figure:: images/rqi-acrn-grub.png
@@ -187,6 +187,7 @@ Configure Hypervisor
 
    .. code-block:: bash
 
+     pip3 install kconfiglib
      cd ~/acrn/acrn-hypervisor
      make all \
         BOARD_FILE=misc/acrn-config/xmls/board-xmls/ros-cube-cfl.xml \
